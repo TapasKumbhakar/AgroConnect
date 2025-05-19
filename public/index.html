@@ -1,0 +1,82 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agricultural Resource Management System (ARMS)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      color: #2c7a7b;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, button {
+      padding: 5px;
+      margin-top: 5px;
+      width: 300px;
+    }
+    #farmersList {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Agricultural Resource Management System</h1>
+
+  <form id="farmerForm">
+    <label>Name: <input type="text" name="name" required /></label>
+    <label>Land Size (acres): <input type="number" name="landSize" required /></label>
+    <label>Soil pH: <input type="number" step="0.1" name="soilPh" required /></label>
+    <label>Location: <input type="text" name="location" required /></label>
+    <label>Preferred Crop: <input type="text" name="preferredCrop" required /></label>
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="farmersList">
+    <h2>Registered Farmers</h2>
+    <ul id="farmerOutput"></ul>
+  </div>
+
+  <script>
+    const form = document.getElementById('farmerForm');
+    const farmerOutput = document.getElementById('farmerOutput');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      const res = await fetch('/api/farmers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        form.reset();
+        loadFarmers();
+      } else {
+        alert('Failed to submit farmer data.');
+      }
+    });
+
+    async function loadFarmers() {
+      const res = await fetch('/api/farmers');
+      const farmers = await res.json();
+      farmerOutput.innerHTML = '';
+      farmers.forEach(f => {
+        const li = document.createElement('li');
+        li.textContent = `${f.name} (${f.location}) - ${f.landSize} acres, Soil pH: ${f.soilPh}, Crop: ${f.preferredCrop}`;
+        farmerOutput.appendChild(li);
+      });
+    }
+
+    // Initial load
+    loadFarmers();
+  </script>
+</body>
+</html>
