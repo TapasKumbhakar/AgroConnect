@@ -1,16 +1,24 @@
 {
   "name": "arcp",
   "version": "1.0.0",
-  "description": "",
+  "description": "Agricultural Resource Management System - A comprehensive platform for farmers to manage resources, get crop recommendations, and access agricultural information",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "agriculture",
+    "farming",
+    "resource-management",
+    "crop-recommendation"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",

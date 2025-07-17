@@ -6,77 +6,893 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Agricultural Resource Management System (ARMS)</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
       padding: 20px;
     }
-    h1 {
-      color: #2c7a7b;
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      overflow: hidden;
     }
-    label {
+    
+    .header {
+      background: linear-gradient(135deg, #2c7a7b 0%, #38a169 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+    
+    .nav-tabs {
+      display: flex;
+      background: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    .nav-tab {
+      flex: 1;
+      padding: 15px;
+      text-align: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .nav-tab.active {
+      background: #2c7a7b;
+      color: white;
+    }
+    
+    .nav-tab:hover:not(.active) {
+      background: #e2e8f0;
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 30px;
+    }
+    
+    .tab-content.active {
       display: block;
-      margin-top: 10px;
     }
-    input, button {
-      padding: 5px;
-      margin-top: 5px;
-      width: 300px;
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
     }
-    #farmersList {
-      margin-top: 30px;
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    label {
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #2d3748;
+    }
+    
+    input, select {
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #2c7a7b;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #2c7a7b 0%, #38a169 100%);
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    }
+    
+    .farmers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    .farmer-card {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      border-left: 4px solid #2c7a7b;
+      transition: transform 0.2s;
+    }
+    
+    .farmer-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .farmer-name {
+      font-size: 1.2em;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 10px;
+    }
+    
+    .farmer-details {
+      color: #4a5568;
+      line-height: 1.6;
+    }
+    
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .analytics-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    
+    .analytics-number {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .analytics-label {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+    
+    .recommendations {
+      background: #e6fffa;
+      border: 1px solid #81e6d9;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    
+    .recommendations h3 {
+      color: #2c7a7b;
+      margin-bottom: 15px;
+    }
+    
+    .crop-recommendation {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 4px solid #38a169;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #4a5568;
+    }
+    
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .alert-success {
+      background: #c6f6d5;
+      border: 1px solid #9ae6b4;
+      color: #22543d;
+    }
+    
+    .alert-error {
+      background: #fed7d7;
+      border: 1px solid #feb2b2;
+      color: #742a2a;
     }
   </style>
 </head>
 <body>
-  <h1>Agricultural Resource Management System</h1>
-
-  <form id="farmerForm">
-    <label>Name: <input type="text" name="name" required /></label>
-    <label>Land Size (acres): <input type="number" name="landSize" required /></label>
-    <label>Soil pH: <input type="number" step="0.1" name="soilPh" required /></label>
-    <label>Location: <input type="text" name="location" required /></label>
-    <label>Preferred Crop: <input type="text" name="preferredCrop" required /></label>
-    <button type="submit">Submit</button>
-  </form>
-
-  <div id="farmersList">
-    <h2>Registered Farmers</h2>
-    <ul id="farmerOutput"></ul>
+  <div class="container">
+    <div class="header">
+      <h1>🌾 Agricultural Resource Management System</h1>
+      <p>Empowering farmers with smart agricultural solutions</p>
+    </div>
+    
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showTab('farmers')">Farmer Management</button>
+      <button class="nav-tab" onclick="showTab('crops')">Crop Information</button>
+      <button class="nav-tab" onclick="showTab('analytics')">Analytics</button>
+      <button class="nav-tab" onclick="showTab('resources')">Resources</button>
+    </div>
+    
+    <!-- Farmers Tab -->
+    <div id="farmers" class="tab-content active">
+      <h2>Register New Farmer</h2>
+      <form id="farmerForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Name *</label>
+            <input type="text" name="name" required />
+          </div>
+          <div class="form-group">
+            <label>Land Size (acres) *</label>
+            <input type="number" name="landSize" step="0.1" required />
+          </div>
+          <div class="form-group">
+            <label>Soil pH *</label>
+            <input type="number" step="0.1" name="soilPh" min="0" max="14" required />
+          </div>
+          <div class="form-group">
+            <label>Location *</label>
+            <input type="text" name="location" required />
+          </div>
+          <div class="form-group">
+            <label>Preferred Crop *</label>
+            <input type="text" name="preferredCrop" required />
+          </div>
+          <div class="form-group">
+            <label>Contact Number</label>
+            <input type="tel" name="contactNumber" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" />
+          </div>
+          <div class="form-group">
+            <label>Farming Experience (years)</label>
+            <input type="number" name="farmingExperience" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Irrigation Type</label>
+            <select name="irrigationType">
+              <option value="Rain-fed">Rain-fed</option>
+              <option value="Drip">Drip</option>
+              <option value="Sprinkler">Sprinkler</option>
+              <option value="Flood">Flood</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Soil Type</label>
+            <select name="soilType">
+              <option value="">Select soil type</option>
+              <option value="Clay">Clay</option>
+              <option value="Sandy">Sandy</option>
+              <option value="Loamy">Loamy</option>
+              <option value="Silty">Silty</option>
+              <option value="Peaty">Peaty</option>
+              <option value="Chalky">Chalky</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn">Register Farmer</button>
+      </form>
+      
+      <div id="cropRecommendations" class="recommendations" style="display: none;">
+        <h3>🌱 Crop Recommendations for Your Soil</h3>
+        <div id="recommendationsList"></div>
+      </div>
+      
+      <div id="farmersList">
+        <h2>Registered Farmers</h2>
+        <div id="farmerOutput" class="farmers-grid"></div>
+      </div>
+    </div>
+    
+    <!-- Crops Tab -->
+    <div id="crops" class="tab-content">
+      <h2>Crop Database</h2>
+      <form id="cropForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Crop Name *</label>
+            <input type="text" name="name" required />
+          </div>
+          <div class="form-group">
+            <label>Season *</label>
+            <select name="season" required>
+              <option value="">Select season</option>
+              <option value="Spring">Spring</option>
+              <option value="Summer">Summer</option>
+              <option value="Monsoon">Monsoon</option>
+              <option value="Winter">Winter</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Min Soil pH *</label>
+            <input type="number" step="0.1" name="soilPhMin" required />
+          </div>
+          <div class="form-group">
+            <label>Max Soil pH *</label>
+            <input type="number" step="0.1" name="soilPhMax" required />
+          </div>
+          <div class="form-group">
+            <label>Water Requirement *</label>
+            <select name="waterRequirement" required>
+              <option value="">Select requirement</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Growth Duration (days) *</label>
+            <input type="number" name="growthDuration" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" name="description" style="width: 100%;" />
+        </div>
+        <button type="submit" class="btn">Add Crop</button>
+      </form>
+      
+      <div id="cropsList">
+        <h2>Available Crops</h2>
+        <div id="cropOutput"></div>
+      </div>
+    </div>
+    
+    <!-- Analytics Tab -->
+    <div id="analytics" class="tab-content">
+      <h2>Farm Analytics Dashboard</h2>
+      <div id="analyticsData" class="loading">Loading analytics...</div>
+    </div>
+    
+    <!-- Resources Tab -->
+    <div id="resources" class="tab-content">
+      <h2>Agricultural Resources</h2>
+      <form id="resourceForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Title *</label>
+            <input type="text" name="title" required />
+          </div>
+          <div class="form-group">
+            <label>Type *</label>
+            <select name="type" required>
+              <option value="">Select type</option>
+              <option value="Article">Article</option>
+              <option value="Video">Video</option>
+              <option value="Guide">Guide</option>
+              <option value="Tool">Tool</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Category *</label>
+            <select name="category" required>
+              <option value="">Select category</option>
+              <option value="Farming Techniques">Farming Techniques</option>
+              <option value="Pest Control">Pest Control</option>
+              <option value="Soil Management">Soil Management</option>
+              <option value="Irrigation">Irrigation</option>
+              <option value="Marketing">Marketing</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>URL</label>
+            <input type="url" name="url" />
+          </div>
+          <div class="form-group">
+            <label>Author</label>
+            <input type="text" name="author" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Content</label>
+          <input type="text" name="content" style="width: 100%;" />
+        </div>
+        <button type="submit" class="btn">Add Resource</button>
+      </form>
+      
+      <div id="resourcesList">
+        <h2>Available Resources</h2>
+        <div id="resourceOutput"></div>
+      </div>
+    </div>
   </div>
 
   <script>
-    const form = document.getElementById('farmerForm');
-    const farmerOutput = document.getElementById('farmerOutput');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = Object.fromEntries(new FormData(form).entries());
-      const res = await fetch('/api/farmers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+    // Global variables
+    let currentTab = 'farmers';
+    
+    // Show alert messages
+    function showAlert(message, type = 'success') {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type}`;
+      alertDiv.textContent = message;
+      
+      const container = document.querySelector(`#${currentTab} .tab-content, #${currentTab}`);
+      container.insertBefore(alertDiv, container.firstChild);
+      
+      setTimeout(() => alertDiv.remove(), 5000);
+    }
+    
+    // Tab functionality
+    function showTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
       });
-      if (res.ok) {
-        form.reset();
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+      currentTab = tabName;
+      
+      // Load data for the active tab
+      if (tabName === 'farmers') {
         loadFarmers();
-      } else {
-        alert('Failed to submit farmer data.');
+      } else if (tabName === 'crops') {
+        loadCrops();
+      } else if (tabName === 'analytics') {
+        loadAnalytics();
+      } else if (tabName === 'resources') {
+        loadResources();
+      }
+    }
+    
+    // Farmer management
+    const farmerForm = document.getElementById('farmerForm');
+    const farmerOutput = document.getElementById('farmerOutput');
+    
+    farmerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(farmerForm);
+      const data = Object.fromEntries(formData.entries());
+      
+      // Handle nested soil pH range for crop recommendations
+      const soilPh = parseFloat(data.soilPh);
+      
+      try {
+        const res = await fetch('/api/farmers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (res.ok) {
+          farmerForm.reset();
+          showAlert('Farmer registered successfully!');
+          loadFarmers();
+          loadCropRecommendations(soilPh);
+        } else {
+          const error = await res.json();
+          showAlert(error.error || 'Failed to register farmer', 'error');
+        }
+      } catch (err) {
+        showAlert('Network error occurred', 'error');
       }
     });
-
+    
     async function loadFarmers() {
-      const res = await fetch('/api/farmers');
-      const farmers = await res.json();
-      farmerOutput.innerHTML = '';
-      farmers.forEach(f => {
-        const li = document.createElement('li');
-        li.textContent = `${f.name} (${f.location}) - ${f.landSize} acres, Soil pH: ${f.soilPh}, Crop: ${f.preferredCrop}`;
-        farmerOutput.appendChild(li);
-      });
+      try {
+        const res = await fetch('/api/farmers');
+        const farmers = await res.json();
+        farmerOutput.innerHTML = '';
+        
+        if (farmers.length === 0) {
+          farmerOutput.innerHTML = '<p class="loading">No farmers registered yet.</p>';
+          return;
+        }
+        
+        farmers.forEach(farmer => {
+          const farmerCard = document.createElement('div');
+          farmerCard.className = 'farmer-card';
+          farmerCard.innerHTML = `
+            <div class="farmer-name">${farmer.name}</div>
+            <div class="farmer-details">
+              📍 <strong>Location:</strong> ${farmer.location}<br>
+              🏞️ <strong>Land Size:</strong> ${farmer.landSize} acres<br>
+              🌱 <strong>Preferred Crop:</strong> ${farmer.preferredCrop}<br>
+              ⚗️ <strong>Soil pH:</strong> ${farmer.soilPh}<br>
+              ${farmer.contactNumber ? `📞 <strong>Contact:</strong> ${farmer.contactNumber}<br>` : ''}
+              ${farmer.email ? `📧 <strong>Email:</strong> ${farmer.email}<br>` : ''}
+              ${farmer.farmingExperience ? `🎓 <strong>Experience:</strong> ${farmer.farmingExperience} years<br>` : ''}
+              💧 <strong>Irrigation:</strong> ${farmer.irrigationType}<br>
+              ${farmer.soilType ? `🌍 <strong>Soil Type:</strong> ${farmer.soilType}` : ''}
+            </div>
+            <button class="btn btn-danger" onclick="deleteFarmer('${farmer._id}')" style="margin-top: 10px; padding: 8px 16px; font-size: 14px;">
+              Delete
+            </button>
+          `;
+          farmerOutput.appendChild(farmerCard);
+        });
+      } catch (err) {
+        farmerOutput.innerHTML = '<p class="loading">Error loading farmers.</p>';
+      }
     }
-
+    
+    async function deleteFarmer(id) {
+      if (!confirm('Are you sure you want to delete this farmer?')) return;
+      
+      try {
+        const res = await fetch(`/api/farmers/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showAlert('Farmer deleted successfully!');
+          loadFarmers();
+        } else {
+          showAlert('Failed to delete farmer', 'error');
+        }
+      } catch (err) {
+        showAlert('Network error occurred', 'error');
+      }
+    }
+    
+    async function loadCropRecommendations(soilPh) {
+      try {
+        const res = await fetch(`/api/crops/recommendations/${soilPh}`);
+        const crops = await res.json();
+        
+        const recommendationsDiv = document.getElementById('cropRecommendations');
+        const recommendationsList = document.getElementById('recommendationsList');
+        
+        if (crops.length > 0) {
+          recommendationsList.innerHTML = '';
+          crops.forEach(crop => {
+            const cropDiv = document.createElement('div');
+            cropDiv.className = 'crop-recommendation';
+            cropDiv.innerHTML = `
+              <strong>${crop.name}</strong> (${crop.season})<br>
+              <small>pH Range: ${crop.soilPhRange.min} - ${crop.soilPhRange.max} | 
+              Water: ${crop.waterRequirement} | 
+              Growth: ${crop.growthDuration} days</small>
+              ${crop.description ? `<br><em>${crop.description}</em>` : ''}
+            `;
+            recommendationsList.appendChild(cropDiv);
+          });
+          recommendationsDiv.style.display = 'block';
+        } else {
+          recommendationsDiv.style.display = 'none';
+        }
+      } catch (err) {
+        console.error('Error loading crop recommendations:', err);
+      }
+    }
+    
+    // Crop management
+    const cropForm = document.getElementById('cropForm');
+    const cropOutput = document.getElementById('cropOutput');
+    
+    cropForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(cropForm);
+      const data = Object.fromEntries(formData.entries());
+      
+      // Transform soil pH data
+      const cropData = {
+        ...data,
+        soilPhRange: {
+          min: parseFloat(data.soilPhMin),
+          max: parseFloat(data.soilPhMax)
+        },
+        growthDuration: parseInt(data.growthDuration)
+      };
+      delete cropData.soilPhMin;
+      delete cropData.soilPhMax;
+      
+      try {
+        const res = await fetch('/api/crops', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cropData)
+        });
+        
+        if (res.ok) {
+          cropForm.reset();
+          showAlert('Crop added successfully!');
+          loadCrops();
+        } else {
+          const error = await res.json();
+          showAlert(error.error || 'Failed to add crop', 'error');
+        }
+      } catch (err) {
+        showAlert('Network error occurred', 'error');
+      }
+    });
+    
+    async function loadCrops() {
+      try {
+        const res = await fetch('/api/crops');
+        const crops = await res.json();
+        cropOutput.innerHTML = '';
+        
+        if (crops.length === 0) {
+          cropOutput.innerHTML = '<p class="loading">No crops in database yet.</p>';
+          return;
+        }
+        
+        const cropsGrid = document.createElement('div');
+        cropsGrid.className = 'farmers-grid';
+        
+        crops.forEach(crop => {
+          const cropCard = document.createElement('div');
+          cropCard.className = 'farmer-card';
+          cropCard.innerHTML = `
+            <div class="farmer-name">${crop.name}</div>
+            <div class="farmer-details">
+              🌤️ <strong>Season:</strong> ${crop.season}<br>
+              ⚗️ <strong>pH Range:</strong> ${crop.soilPhRange.min} - ${crop.soilPhRange.max}<br>
+              💧 <strong>Water Need:</strong> ${crop.waterRequirement}<br>
+              ⏱️ <strong>Growth Period:</strong> ${crop.growthDuration} days<br>
+              ${crop.description ? `📝 <strong>Description:</strong> ${crop.description}` : ''}
+            </div>
+          `;
+          cropsGrid.appendChild(cropCard);
+        });
+        
+        cropOutput.appendChild(cropsGrid);
+      } catch (err) {
+        cropOutput.innerHTML = '<p class="loading">Error loading crops.</p>';
+      }
+    }
+    
+    // Analytics
+    async function loadAnalytics() {
+      const analyticsDiv = document.getElementById('analyticsData');
+      
+      try {
+        const res = await fetch('/api/analytics');
+        const data = await res.json();
+        
+        analyticsDiv.innerHTML = `
+          <div class="analytics-grid">
+            <div class="analytics-card">
+              <div class="analytics-number">${data.totalFarmers}</div>
+              <div class="analytics-label">Total Farmers</div>
+            </div>
+            <div class="analytics-card">
+              <div class="analytics-number">${data.totalLandSize.toFixed(1)}</div>
+              <div class="analytics-label">Total Land (acres)</div>
+            </div>
+            <div class="analytics-card">
+              <div class="analytics-number">${data.cropDistribution.length}</div>
+              <div class="analytics-label">Crop Varieties</div>
+            </div>
+            <div class="analytics-card">
+              <div class="analytics-number">${data.locationDistribution.length}</div>
+              <div class="analytics-label">Locations</div>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+            <div>
+              <h3>Popular Crops</h3>
+              ${data.cropDistribution.map(crop => `
+                <div class="farmer-card" style="margin-bottom: 10px;">
+                  <strong>${crop._id || 'Unknown'}</strong> - ${crop.count} farmers
+                </div>
+              `).join('')}
+            </div>
+            
+            <div>
+              <h3>Farmer Distribution by Location</h3>
+              ${data.locationDistribution.map(location => `
+                <div class="farmer-card" style="margin-bottom: 10px;">
+                  <strong>${location._id}</strong> - ${location.count} farmers
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        analyticsDiv.innerHTML = '<p class="loading">Error loading analytics.</p>';
+      }
+    }
+    
+    // Resource management
+    const resourceForm = document.getElementById('resourceForm');
+    const resourceOutput = document.getElementById('resourceOutput');
+    
+    resourceForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(resourceForm);
+      const data = Object.fromEntries(formData.entries());
+      
+      try {
+        const res = await fetch('/api/resources', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (res.ok) {
+          resourceForm.reset();
+          showAlert('Resource added successfully!');
+          loadResources();
+        } else {
+          const error = await res.json();
+          showAlert(error.error || 'Failed to add resource', 'error');
+        }
+      } catch (err) {
+        showAlert('Network error occurred', 'error');
+      }
+    });
+    
+    async function loadResources() {
+      try {
+        const res = await fetch('/api/resources');
+        const resources = await res.json();
+        resourceOutput.innerHTML = '';
+        
+        if (resources.length === 0) {
+          resourceOutput.innerHTML = '<p class="loading">No resources available yet.</p>';
+          return;
+        }
+        
+        const resourcesGrid = document.createElement('div');
+        resourcesGrid.className = 'farmers-grid';
+        
+        resources.forEach(resource => {
+          const resourceCard = document.createElement('div');
+          resourceCard.className = 'farmer-card';
+          resourceCard.innerHTML = `
+            <div class="farmer-name">${resource.title}</div>
+            <div class="farmer-details">
+              📚 <strong>Type:</strong> ${resource.type}<br>
+              🏷️ <strong>Category:</strong> ${resource.category}<br>
+              ${resource.author ? `👤 <strong>Author:</strong> ${resource.author}<br>` : ''}
+              ${resource.content ? `📝 <strong>Content:</strong> ${resource.content}<br>` : ''}
+              ${resource.url ? `🔗 <strong>URL:</strong> <a href="${resource.url}" target="_blank">View Resource</a>` : ''}
+            </div>
+          `;
+          resourcesGrid.appendChild(resourceCard);
+        });
+        
+        resourceOutput.appendChild(resourcesGrid);
+      } catch (err) {
+        resourceOutput.innerHTML = '<p class="loading">Error loading resources.</p>';
+      }
+    }
+    
     // Initial load
-    loadFarmers();
+    document.addEventListener('DOMContentLoaded', () => {
+      loadFarmers();
+      
+      // Add some sample crops to the database
+      initializeSampleData();
+    });
+    
+    async function initializeSampleData() {
+      // Check if crops already exist
+      try {
+        const cropsRes = await fetch('/api/crops');
+        const crops = await cropsRes.json();
+        
+        if (crops.length === 0) {
+          // Add sample crops
+          const sampleCrops = [
+            {
+              name: "Rice",
+              season: "Monsoon",
+              soilPhRange: { min: 6.0, max: 7.0 },
+              waterRequirement: "High",
+              growthDuration: 120,
+              description: "Staple food crop, requires flooded fields"
+            },
+            {
+              name: "Wheat",
+              season: "Winter",
+              soilPhRange: { min: 6.0, max: 7.5 },
+              waterRequirement: "Medium",
+              growthDuration: 120,
+              description: "Major cereal crop, drought resistant"
+            },
+            {
+              name: "Tomato",
+              season: "Summer",
+              soilPhRange: { min: 6.0, max: 6.8 },
+              waterRequirement: "Medium",
+              growthDuration: 90,
+              description: "Vegetable crop, rich in vitamins"
+            },
+            {
+              name: "Potato",
+              season: "Winter",
+              soilPhRange: { min: 5.5, max: 6.5 },
+              waterRequirement: "Medium",
+              growthDuration: 90,
+              description: "Tuber crop, high in carbohydrates"
+            }
+          ];
+          
+          for (const crop of sampleCrops) {
+            await fetch('/api/crops', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(crop)
+            });
+          }
+        }
+        
+        // Add sample resources
+        const resourcesRes = await fetch('/api/resources');
+        const resources = await resourcesRes.json();
+        
+        if (resources.length === 0) {
+          const sampleResources = [
+            {
+              title: "Organic Farming Techniques",
+              type: "Guide",
+              category: "Farming Techniques",
+              content: "Comprehensive guide to sustainable farming practices",
+              author: "Agricultural Extension Office"
+            },
+            {
+              title: "Integrated Pest Management",
+              type: "Article",
+              category: "Pest Control",
+              content: "Natural methods for controlling crop pests",
+              author: "Dr. Smith"
+            },
+            {
+              title: "Soil Testing Methods",
+              type: "Video",
+              category: "Soil Management",
+              content: "Learn how to test your soil pH and nutrients",
+              author: "Farm University"
+            }
+          ];
+          
+          for (const resource of sampleResources) {
+            await fetch('/api/resources', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(resource)
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Error initializing sample data:', err);
+      }
+    }
   </script>
 </body>
 </html>
